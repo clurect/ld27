@@ -1,5 +1,5 @@
 //set main namespace
-goog.provide('helloworld');
+goog.provide('tsn');
 
 
 //get requirements
@@ -23,27 +23,23 @@ goog.require('lime.transitions.Dissolve');
 goog.require('goog.math');
 
 // entrypoint
-helloworld.start = function(){
+tsn.start = function(){
 
     var moves_in = false;
 	var director = new lime.Director(document.body,1024,768),
 	    scene = new lime.Scene(),
-
-	    character = new lime.Circle().setSize(150,150).setFill('assets/shuriken.png').setSize(75,75).setPosition(512,384),
+        background = new lime.Sprite().setFill('assets/scene1.png').setPosition(0,0).setSize(1024,768).setAnchorPoint(0,0),
+	    character = new lime.Circle().setSize(150,150).setFill('assets/ninja.png').setSize(75,75).setPosition(512,384),
         //title = text(800, 70, 512, 80, '10 second ninja'),
-        exit = new lime.Sprite().setSize(40,300).setPosition(0,384).setFill('#0c0'),
+        exit = new lime.Sprite().setSize(100,150).setPosition(50,384).setFill('assets/door.png'),
         endGame = new lime.Scene().appendChild( text(800, 70, 512, 384, 'You have died dishonorably')),
-        timer = text(80,80, 900, 80, '10');
-        //eni = new lime.Sprite().setSize(75,75).setPosition(512,175).setFill('#d00');
-        //var triangle = new lime.Polygon().addPoints(512,200, 450,300, 550,300).setFill('#c0c');
-
-        var enimee = {
-            body : new lime.Sprite().setSize(75,75).setPosition(512,175).setFill('#d00'),
-            view : new lime.Polygon().addPoints(512,200, 450,300, 550,300).setFill('#c0c'),
-            
-        };
-    
+        timer = text(80,80, 900, 80, '10', 1),
+        deadsies = new lime.Sprite().setSize(75,75).setPosition(512,500).setFill('assets/dead.png');
+        
+        var enimee = make_enimee(512,175,100,100);
+    endGame.appendChild(deadsies);
     //add character and title to the scene
+    scene.appendChild(background);
     scene.appendChild(character);
     //scene.appendChild(title);
     scene.appendChild(exit);
@@ -54,7 +50,7 @@ helloworld.start = function(){
     runTimer = function () {
         time-=.1;
         scene.removeChild(timer);
-        timer = text(80,80, 900, 80, time.toFixed(1));
+        timer = text(80,80, 900, 80, time.toFixed(1),1);
         scene.appendChild(timer); 
     }
     var seqs = [];
@@ -63,9 +59,7 @@ helloworld.start = function(){
     });
     var time = 10.0;
     lime.scheduleManager.scheduleWithDelay(runTimer, parent.bottomBlock, 100);
-    gameover = function() {
-        director.replaceScene(endGame, lime.transitions.Dissolve, 3);
-    }
+    
     
     
     lime.scheduleManager.schedule(function(dt) {
@@ -98,11 +92,16 @@ helloworld.start = function(){
         seqs=[];
     });
     lime.scheduleManager.callAfter(function() {
-        lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
+        
         if (!moves_in) {
             gameover();
         }   
-    }, this, 10000)
+    }, this, 10000);
+    gameover = function() {
+            console.log("HAlp");
+            lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
+            director.replaceScene(endGame, lime.transitions.Dissolve, 3);
+    }
 	// set current scene active
 	director.replaceScene(scene);
 
@@ -110,4 +109,4 @@ helloworld.start = function(){
 
 
 //this is required for outside access after code is compiled in ADVANCED_COMPILATIONS mode
-goog.exportSymbol('helloworld.start', helloworld.start);
+goog.exportSymbol('tsn.start', tsn.start);
