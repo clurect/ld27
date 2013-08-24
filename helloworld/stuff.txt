@@ -1,0 +1,59 @@
+goog.events.listen(target,['mousedown','touchstart'],function(e){
+
+        //animate
+        /*
+        target.runAction(new lime.animation.Spawn(
+            new lime.animation.FadeTo(.5).setDuration(.2),            
+            new lime.animation.ScaleTo(1.5).setDuration(.8),
+            new lime.animation.RotateBy(-360)
+        ));
+        */
+        //target.runAction(new lime.animation.Loop(new lime.animation.RotateBy(-360)));
+
+        title.runAction(new lime.animation.FadeTo(1));
+        
+        
+        //scene.appendChild(new lime.Sprite().setSize(10,10).setFill('#c00').setAnchorPoint(e.screenPosition.x,e.screenPosition.y));
+        //let target follow the mouse/finger
+        e.startDrag();
+        
+        //listen for end event
+        /*
+        e.swallow(['mouseup','touchend'],function(){
+            target.runAction(new lime.animation.Spawn(
+                new lime.animation.FadeTo(1),
+                new lime.animation.ScaleTo(1),
+                new lime.animation.MoveTo(512,384)
+            ));
+
+            title.runAction(new lime.animation.FadeTo(0));
+                    //target.runAction(new lime.animation.Loop(new lime.animation.RotateBy(360)));
+
+        });
+        */
+
+
+    });
+    function line(size, x1, y1, x2, y2){ 
+      var dx = Math.abs(x2-x1); 
+      var dy = Math.abs(y2-y1); 
+      var width = Math.sqrt(dx*dx+dy*dy)+size; 
+      return new lime.Sprite().setSize(width, size).setAnchorPoint(size/2/ 
+    width, .5).setRotation( 
+        -Math.atan2(y2-y1, x2-x1)*180/Math.PI 
+        ).setPosition(x1, y1); 
+    } 
+    /*
+    goog.events.listen(scene, ['mousedown','touchstart'],function(e){
+    var x = e.position.x,
+        y = e.position.y;
+        e.swallow(['mouseup','touchend'],function(ev){
+            var dx = ev.position.x,
+                dy = ev.position.y;
+                target.runAction(
+                    new lime.animation.MoveTo(dx,dy)
+                );
+                //scene.appendChild(line(1,x, y, ev.position.x, ev.position.y).setFill('#c00'));
+        });
+    });
+    */
