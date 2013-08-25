@@ -25,18 +25,17 @@ goog.require('goog.math');
 // entrypoint
 tsn.start = function(){
 
-    var moves_in = false;
-	var director = new lime.Director(document.body,1024,768),
+    var moves_in = false,
+	    director = new lime.Director(document.body,1024,768),
 	    scene = new lime.Scene(),
-        background = new lime.Sprite().setFill('assets/scene1.png').setPosition(0,0).setSize(1024,768).setAnchorPoint(0,0),
-	    character = new lime.Circle().setSize(150,150).setFill('assets/ninja.png').setSize(75,75).setPosition(512,384),
+        background = new lime.Sprite().setFill('assets/scene1.png').setPosition(0, 0).setSize(1024, 768).setAnchorPoint(0, 0),
+	    character = new lime.Circle().setSize(150, 150).setFill('assets/ninja.png').setSize(75, 75).setPosition(512, 384),
         //title = text(800, 70, 512, 80, '10 second ninja'),
-        exit = new lime.Sprite().setSize(100,150).setPosition(50,384).setFill('assets/door.png'),
+        exit = new lime.Sprite().setSize(100, 150).setPosition(50, 384).setFill('assets/door.png'),
         endGame = new lime.Scene().appendChild( text(800, 70, 512, 384, 'You have died dishonorably')),
         timer = text(80,80, 900, 80, '10', 1),
-        deadsies = new lime.Sprite().setSize(75,75).setPosition(512,500).setFill('assets/dead.png');
-        
-        var enimee = make_enimee(512,175,100,100);
+        deadsies = new lime.Sprite().setSize(75, 75).setPosition(512, 500).setFill('assets/dead.png'),
+        enimee = make_enimee(512,175,100,100);
     endGame.appendChild(deadsies);
     //add character and title to the scene
     scene.appendChild(background);
@@ -48,36 +47,42 @@ tsn.start = function(){
     scene.appendChild(timer);
 	director.makeMobileWebAppCapable();
     runTimer = function () {
-        time-=.1;
+        time -= 0.1;
         scene.removeChild(timer);
-        timer = text(80,80, 900, 80, time.toFixed(1),1);
+        timer = text(80, 80, 900, 80, time.toFixed(1),1);
         scene.appendChild(timer); 
-    }
+    };
     var seqs = [];
     goog.events.listen(scene, ['mousedown','touchstart'],function(e){
         seqs.push(new lime.animation.MoveTo(e.position.x,e.position.y)); 
     });
+    gameover = function() {
+            console.log("HAlp");
+            lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
+            director.replaceScene(endGame, lime.transitions.Dissolve, 3);
+    };
     var time = 10.0;
     lime.scheduleManager.scheduleWithDelay(runTimer, parent.bottomBlock, 100);
-    
-    
-    
-    lime.scheduleManager.schedule(function(dt) {
+   
+    var loopy = 
+    function(dt) {
        
-        
         if (enimee)  {
-            if (goog.math.Box.intersects(this.getBoundingBox(),enimee.body.getBoundingBox())) {
+            if (goog.math.Box.intersects(character.getBoundingBox(),enimee.body.getBoundingBox())) {
                 console.log('hit!');
                 scene.removeChild(enimee.body);
-                scene.removeChild(enimee.view)
+                scene.removeChild(enimee.view);
                 enimee=undefined;
                 
             }
-            else if (goog.math.Box.intersects(this.getBoundingBox(),enimee.view.getBoundingBox())) {
+            else if (goog.math.Box.intersects(character.getBoundingBox(),enimee.view.getBoundingBox())) {
                 gameover();
+                lime.scheduleManager.unschedule(loopy,parent.bottomBlock);
             }
         }
-    },character);
+    };
+    
+    lime.scheduleManager.schedule(loopy,parent.bottomBlock);
     goog.events.listen(exit, ['mouseup', 'touchend'], function(e) {
         // the final click has been made, move the character now
         moves_in = true;
@@ -96,16 +101,12 @@ tsn.start = function(){
         if (!moves_in) {
             gameover();
         }   
-    }, this, 10000);
-    gameover = function() {
-            console.log("HAlp");
-            lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
-            director.replaceScene(endGame, lime.transitions.Dissolve, 3);
-    }
+    }, parent.bottomBlock, 10000);
+    
 	// set current scene active
 	director.replaceScene(scene);
 
-}
+};
 
 
 //this is required for outside access after code is compiled in ADVANCED_COMPILATIONS mode
