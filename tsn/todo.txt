@@ -1,4 +1,0 @@
-BOOMDIGGITY
-- dying doesn't show gameover right
-- add level victory
-- add next levels
