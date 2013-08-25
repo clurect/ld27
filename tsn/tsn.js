@@ -35,7 +35,8 @@ tsn.start = function() {
         endGame = new lime.Scene().appendChild( text(800, 70, 512, 384, 'You have died dishonorably', 0.4)),
         timer = text(40, 40, 900, 80, '10', 0),
         deadsies = new lime.Sprite().setSize(75, 75).setPosition(512, 500).setFill('assets/dead.png'),
-        enemies = [make_enemy(512, 175, 100, 100), make_enemy(512, 675, 100, -100)];
+        enemies = [make_enemy(512, 175, 100, 100), make_enemy(512, 675, 100, -100)],
+        winGame = new lime.Scene().appendChild(text(800, 70, 512, 384, 'You have defeated all!', 1));
         //enimee = make_enimee(512, 175, 100, 100);
     
     endGame.appendChild(deadsies);
@@ -54,6 +55,7 @@ tsn.start = function() {
         timer = text(40, 40, 900, 40, time.toFixed(1), 0);
         scene.appendChild(timer); 
     };
+    
     var seqs = [];
     goog.events.listen(scene, ['mousedown', 'touchstart'], function(e) {
         seqs.push(new lime.animation.MoveTo(e.position.x, e.position.y)); 
@@ -68,7 +70,9 @@ tsn.start = function() {
    
     var loopy = 
     function(dt) {
-        
+        if (enemies.length === 0) {
+            win();
+        }
         var i;
         for (i = enemies.length - 1; i >= 0; i -= 1) {
             
@@ -84,7 +88,10 @@ tsn.start = function() {
             }
         }
     };
-    
+    win = function () {
+        lime.scheduleManager.unschedule(loopy, parent.bottomBlock);
+        director.replaceScene(winGame, lime.transitions.Dissolve, 5);
+    };
     lime.scheduleManager.schedule(loopy,parent.bottomBlock);
     goog.events.listen(exit, ['mouseup', 'touchend'], function(e) {
         // the final click has been made, move the character now
