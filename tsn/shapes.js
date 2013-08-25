@@ -1,6 +1,6 @@
 function text (sx,sy,x,y,text,op) {
     return new lime.Layer().setPosition(x,y)
-    .appendChild(new lime.RoundedRect().setSize(sx,sy).setFill(255,255,255,op).setRadius(10))
+    .appendChild(new lime.RoundedRect().setSize(sx,sy).setFill(100,100,100,op).setRadius(10))
     .appendChild(new lime.Label().setSize(sx,sy).setFontSize(60).setText(text));
 }
 function make_enimee (x,y, dx, dy) {
