@@ -33,23 +33,25 @@ tsn.start = function() {
         //title = text(800, 70, 512, 80, '10 second ninja'),
         exit = new lime.Sprite().setSize(100, 150).setPosition(50, 384).setFill('assets/door.png'),
         endGame = new lime.Scene().appendChild( text(800, 70, 512, 384, 'You have died dishonorably', 0.4)),
-        timer = text(80, 80, 900, 80, '10', 1),
+        timer = text(40, 40, 900, 80, '10', 0),
         deadsies = new lime.Sprite().setSize(75, 75).setPosition(512, 500).setFill('assets/dead.png'),
-        enimee = make_enimee(512, 175, 100, 100);
+        enemies = [make_enemy(512, 175, 100, 100), make_enemy(512, 675, 100, -100)];
+        //enimee = make_enimee(512, 175, 100, 100);
+    
     endGame.appendChild(deadsies);
-    //add character and title to the scene
     scene.appendChild(background);
     scene.appendChild(character);
-    //scene.appendChild(title);
     scene.appendChild(exit);
-    scene.appendChild(enimee.body);
-    scene.appendChild(enimee.view);
+    enemies.forEach(function (ene) {
+        scene.appendChild(ene.body);
+        scene.appendChild(ene.view);
+    });
     scene.appendChild(timer);
 	director.makeMobileWebAppCapable();
     runTimer = function () {
         time -= 0.1;
         scene.removeChild(timer);
-        timer = text(80, 80, 900, 80, time.toFixed(1), 1);
+        timer = text(40, 40, 900, 40, time.toFixed(1), 0);
         scene.appendChild(timer); 
     };
     var seqs = [];
@@ -66,15 +68,17 @@ tsn.start = function() {
    
     var loopy = 
     function(dt) {
-       
-        if (enimee) {
-            if (goog.math.Box.intersects(character.getBoundingBox(),enimee.body.getBoundingBox())) {
+        
+        var i;
+        for (i = enemies.length - 1; i >= 0; i -= 1) {
+            
+            if (goog.math.Box.intersects(character.getBoundingBox(),enemies[i].body.getBoundingBox())) {
                 console.log('hit!');
-                scene.removeChild(enimee.body);
-                scene.removeChild(enimee.view);
-                enimee=undefined;                
+                scene.removeChild(enemies[i].body);
+                scene.removeChild(enemies[i].view);
+                enemies.splice(i,1);              
             }
-            else if (goog.math.Box.intersects(character.getBoundingBox(),enimee.view.getBoundingBox())) {
+            else if (goog.math.Box.intersects(character.getBoundingBox(),enemies[i].view.getBoundingBox())) {
                 gameover();
                 lime.scheduleManager.unschedule(loopy,parent.bottomBlock);
             }
