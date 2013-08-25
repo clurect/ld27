@@ -25,19 +25,30 @@ goog.require('goog.math');
 // entrypoint
 tsn.start = function() {
 
+make_text = function (sx,sy,x,y,t,op) {
+        return new lime.Layer().setPosition(x,y)
+        .appendChild(new lime.RoundedRect().setSize(sx,sy).setFill(100,100,100,op).setRadius(10))
+        .appendChild(new lime.Label().setSize(sx,sy).setFontSize(60).setText(t));
+    };
+ make_enemy = function (x,y, dx, dy) {
+    return {
+        body : new lime.Sprite().setSize(75,75).setPosition(x,y).setFill('assets/enimee.png'),
+        view : new lime.Polygon().addPoints(x,y, x-dx,y+dy, x+dx,y+dy).setFill(247,247,43,0.4)
+    };
+};
     var moves_in = false,
 	    director = new lime.Director(document.body,1024,768),
 	    scene = new lime.Scene(),
         background = new lime.Sprite().setFill('assets/scene1.png').setPosition(0, 0).setSize(1024, 768).setAnchorPoint(0, 0),
 	    character = new lime.Circle().setSize(150, 150).setFill('assets/ninja.png').setSize(75, 75).setPosition(512, 384),
-        //title = text(800, 70, 512, 80, '10 second ninja'),
+        //title = make_text(800, 70, 512, 80, '10 second ninja'),
         exit = new lime.Sprite().setSize(100, 150).setPosition(50, 384).setFill('assets/door.png'),
-        endGame = new lime.Scene().appendChild( text(800, 70, 512, 384, 'You have died dishonorably', 0.4)),
-        timer = text(40, 40, 900, 80, '10', 0),
+        endGame = new lime.Scene().appendChild( make_text(800, 70, 512, 384, 'You have died dishonorably', 0.4)),
+        timer = make_text(40, 40, 900, 80, '10', 0),
         deadsies = new lime.Sprite().setSize(75, 75).setPosition(512, 500).setFill('assets/dead.png'),
         enemies = [make_enemy(512, 175, 100, 100), make_enemy(512, 675, 100, -100)],
-        winGame = new lime.Scene().appendChild(text(800, 70, 512, 384, 'You have defeated all!', 1));
-        //enimee = make_enimee(512, 175, 100, 100);
+        winGame = new lime.Scene().appendChild(make_text(800, 70, 512, 384, 'You have defeated all!', 1));
+        
     
     endGame.appendChild(deadsies);
     scene.appendChild(background);
@@ -49,10 +60,11 @@ tsn.start = function() {
     });
     scene.appendChild(timer);
 	director.makeMobileWebAppCapable();
+    
     runTimer = function () {
         time -= 0.1;
         scene.removeChild(timer);
-        timer = text(40, 40, 900, 40, time.toFixed(1), 0);
+        timer = make_text(40, 40, 900, 40, time.toFixed(1), 0);
         scene.appendChild(timer); 
     };
     
