@@ -1,9 +1,3 @@
-closure/*
-box2d/*
-closure
-box2d
-bin/external/*
-bin/projects
 .DS_Store
-tsn/compiled/*
+tsn/bin/*
 
