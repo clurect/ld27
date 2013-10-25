@@ -25,17 +25,17 @@ goog.require('goog.math');
 // entrypoint
 tsn.start = function() {
 
-make_text = function (sx,sy,x,y,t,op) {
-        return new lime.Layer().setPosition(x,y)
-        .appendChild(new lime.RoundedRect().setSize(sx,sy).setFill(100,100,100,op).setRadius(10))
-        .appendChild(new lime.Label().setSize(sx,sy).setFontSize(60).setText(t));
+    make_text = function (sx,sy,x,y,t,op) {
+            return new lime.Layer().setPosition(x,y)
+            .appendChild(new lime.RoundedRect().setSize(sx,sy).setFill(100,100,100,op).setRadius(10))
+            .appendChild(new lime.Label().setSize(sx,sy).setFontSize(60).setText(t));
+        };
+     make_enemy = function (x,y, dx, dy) {
+        return {
+            body : new lime.Sprite().setSize(75,75).setPosition(x,y).setFill('assets/enimee.png'),
+            view : new lime.Polygon().addPoints(x,y, x-dx,y+dy, x+dx,y+dy).setFill(247,247,43,0.4)
+        };
     };
- make_enemy = function (x,y, dx, dy) {
-    return {
-        body : new lime.Sprite().setSize(75,75).setPosition(x,y).setFill('assets/enimee.png'),
-        view : new lime.Polygon().addPoints(x,y, x-dx,y+dy, x+dx,y+dy).setFill(247,247,43,0.4)
-    };
-};
     var moves_in = false,
 	    director = new lime.Director(document.body,1024,768),
 	    scene = new lime.Scene(),
@@ -49,7 +49,7 @@ make_text = function (sx,sy,x,y,t,op) {
         enemies = [make_enemy(512, 175, 100, 100), make_enemy(512, 675, 100, -100)],
         winGame = new lime.Scene().appendChild(make_text(800, 70, 512, 384, 'You have defeated all!', 1));
         
-    
+    // building the scenes
     endGame.appendChild(deadsies);
     scene.appendChild(background);
     scene.appendChild(character);
@@ -73,23 +73,22 @@ make_text = function (sx,sy,x,y,t,op) {
         seqs.push(new lime.animation.MoveTo(e.position.x, e.position.y)); 
     });
     gameover = function() {
-            console.log("HAlp");
-            lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
-            director.replaceScene(endGame, lime.transitions.Dissolve, 3);
+        // without this line the timer would keep running after the game is lost
+        lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);        
+        director.replaceScene(endGame, lime.transitions.Dissolve, 3);
     };
     var time = 10.0;
     lime.scheduleManager.scheduleWithDelay(runTimer, parent.bottomBlock, 100);
    
     var loopy = 
     function(dt) {
-        if (enemies.length === 0) {
+        if (enemies.length === 0) { 
             win();
         }
         var i;
+        //checking collisions
         for (i = enemies.length - 1; i >= 0; i -= 1) {
-            
             if (goog.math.Box.intersects(character.getBoundingBox(),enemies[i].body.getBoundingBox())) {
-                console.log('hit!');
                 scene.removeChild(enemies[i].body);
                 scene.removeChild(enemies[i].view);
                 enemies.splice(i,1);              
@@ -104,20 +103,26 @@ make_text = function (sx,sy,x,y,t,op) {
         lime.scheduleManager.unschedule(loopy, parent.bottomBlock);
         director.replaceScene(winGame, lime.transitions.Dissolve, 5);
     };
+    
     lime.scheduleManager.schedule(loopy,parent.bottomBlock);
     goog.events.listen(exit, ['mouseup', 'touchend'], function(e) {
         // the final click has been made, move the character now
         moves_in = true;
+        // allows player to see how quickly they won
         lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
         
+        // one move action cannot be a sequence
         if (seqs.length > 1) {
             character.runAction(new lime.animation.Sequence(seqs));
         }
         else if (seqs.length === 1) {
             character.runAction(seqs[0]);
         }
+        // the sequence will use the old move actions if not removed
+        // this will most likely cause problems when extra levels are added
         seqs=[];
     });
+    // run the game for only 10 seconds
     lime.scheduleManager.callAfter(function() {
         
         if (!moves_in) {
