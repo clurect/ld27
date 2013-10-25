@@ -1,5 +1,4 @@
-# Ten Second Ninja (TSN) for Ludum Dare 27
-
+# Ten Second Ninja (TSN)
 ## Getting Started:
 
 ### LimeJS 
