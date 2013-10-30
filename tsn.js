@@ -21,7 +21,8 @@ tsn.start = function() {
     director.makeMobileWebAppCapable();
     
     var init = function (s) {   
-        console.log("hallo");
+		var seqs = [];
+		console.log(s.name);
 		level = s;
         scene = s.scene;
         moves_in = false;
@@ -32,12 +33,33 @@ tsn.start = function() {
         
         time = 10.0;
         lime.scheduleManager.scheduleWithDelay(runTimer, parent.bottomBlock, 100);
-
+		lime.scheduleManager.schedule(loopy,parent.bottomBlock);
+		
+		goog.events.listen(scene, ['mousedown', 'touchstart'], function(e) {
+			seqs.push(new lime.animation.MoveTo(e.position.x, e.position.y)); 
+		});
+		goog.events.listen(level.exit, ['mouseup', 'touchend'], function(e) {
+			// the final click has been made, move the character now
+			moves_in = true;
+			// allows player to see how quickly they won
+			lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
+			
+			// one move action cannot be a sequence
+			if (seqs.length > 1) {
+				level.ninja.runAction(new lime.animation.Sequence(seqs));
+			}
+			else if (seqs.length === 1) {
+				level.ninja.runAction(seqs[0]);
+			}
+			// the sequence will use the old move actions if not removed
+			// this will most likely cause problems when extra levels are added
+			seqs=[];
+		});
     };
     var gameover = function () {
         // without this line the timer would keep running after the game is lost
         lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);        
-        director.replaceScene(new tsn.end(), lime.transitions.Dissolve, 3);
+        director.replaceScene((new tsn.end()).scene, lime.transitions.Dissolve, 3);
         
     };
 
@@ -47,16 +69,12 @@ tsn.start = function() {
 			gameover();
 			time=0.0;
 		} 
-		
-        
         scene.removeChild(timer);
         timer = new tsn.text(40, 40, 900, 40, time.toFixed(1), 0);
         scene.appendChild(timer); 
     };
-	var seqs = [];
-		goog.events.listen(scene, ['mousedown', 'touchstart'], function(e) {
-        seqs.push(new lime.animation.MoveTo(e.position.x, e.position.y)); 
-    });
+
+	
 	var loopy = 
     function(dt) {
         if (level.enemies.length === 0) { 
@@ -78,27 +96,15 @@ tsn.start = function() {
     };
     win = function () {
         lime.scheduleManager.unschedule(loopy, parent.bottomBlock);
-        director.replaceScene(new tsn.win(), lime.transitions.Dissolve, 5);
+        
+		if (level.next.name === 'win') 
+			director.replaceScene(level.next.scene, lime.transitions.Dissolve, 5);
+		else 
+			init(level.next);
     };
     
-    lime.scheduleManager.schedule(loopy,parent.bottomBlock);
-    goog.events.listen(level.exit, ['mouseup', 'touchend'], function(e) {
-        // the final click has been made, move the character now
-        moves_in = true;
-        // allows player to see how quickly they won
-        lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);
-        
-        // one move action cannot be a sequence
-        if (seqs.length > 1) {
-            level.ninja.runAction(new lime.animation.Sequence(seqs));
-        }
-        else if (seqs.length === 1) {
-            level.ninja.runAction(seqs[0]);
-        }
-        // the sequence will use the old move actions if not removed
-        // this will most likely cause problems when extra levels are added
-        seqs=[];
-    });
+    
+    
 }; //end of tsn.start
 
 goog.exportSymbol('tsn.start', tsn.start);
