@@ -19,8 +19,7 @@ Go to <https://github.com/digitalfruit/limejs> and follow his instructions to in
 ### Installation - Advanced
 1. Set the path in limejs/bin/projects to the absolute path of "tsn".
 2. Go to limejs/
-3. bin/lime.py build tsn -o ../tsn/compiled/tsn.js -a
-3.1. See <http://www.limejs.com/7-building> for more options.
+3. bin/lime.py build tsn -o ../tsn/compiled/tsn.js -a (See <http://www.limejs.com/7-building> for more options.)
 4. Go to tsn/
 5. cp -r assets bin/
 6. cp tsn.html bin/
