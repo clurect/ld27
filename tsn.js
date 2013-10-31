@@ -7,6 +7,7 @@ goog.require('tsn.text');
 goog.require('lime.transitions.Dissolve');
 goog.require('lime.animation.Sequence');
 goog.require('lime.animation.MoveTo');
+goog.require('lime.GlossyButton');
 
 var scene,
 	level,
@@ -58,8 +59,14 @@ tsn.start = function() {
     };
     var gameover = function () {
         // without this line the timer would keep running after the game is lost
-        lime.scheduleManager.unschedule(runTimer,parent.bottomBlock);        
-        director.replaceScene((new tsn.end()).scene, lime.transitions.Dissolve, 3);
+        lime.scheduleManager.unschedule(runTimer,parent.bottomBlock); 
+		lime.scheduleManager.unschedule(loopy,parent.bottomBlock);
+		level = new tsn.end();
+        director.replaceScene(level.scene, lime.transitions.Dissolve, 3);
+		goog.events.listen(level.button, 'click', function(e) {
+			console.log('been clicked');
+			init(new tsn.lvl1()); 
+		});
         
     };
 
